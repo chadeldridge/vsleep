@@ -1,12 +1,13 @@
-use std::thread;
-use std::time::Duration;
-use vsleep::spinner::Spinners;
+use vsleep::core::{Spinners, TickData, Timer};
 
 mod cli;
 
+const DEFAULT_INTERVAL: i64 = 1;
+
 fn main() {
     let cli = cli::Cli::new(cli::Args::new());
-    let interval = Duration::from_secs(1);
+    let verbose = cli.args.verbose;
+    let date_format = cli.args.date_format.clone();
     let mut spinners = Spinners::default();
 
     if !cli.args.file.is_empty() {
@@ -32,6 +33,7 @@ fn main() {
         }
     };
 
+    let mut t = Timer::new(duration, DEFAULT_INTERVAL);
     let mut s = match spinners.get_spinner(&cli.args.spinner) {
         Some(s) => s,
         None => {
@@ -40,16 +42,18 @@ fn main() {
         }
     };
 
-    //println!("using {}", s.get_name());
-    for i in 1..=duration {
-        thread::sleep(interval);
-
+    t.start(|tick| {
         let frame = s.get_frame();
-        thread::spawn(move || {
-            print_status(i, frame);
-        });
-
+        println!("{}", format_tick(&frame, tick, verbose, &date_format));
         s.step_frame();
+    });
+}
+
+fn format_tick(frame: &str, tick: &TickData, verbose: u8, date_format: &str) -> String {
+    match verbose {
+        0 => frame.to_string(),
+        1 => format!("{} {}", frame, tick.remaining),
+        _ => format!("{} {} {}", tick.now.format(date_format), frame, tick.remaining),
     }
 }
 
@@ -58,8 +62,4 @@ fn show_spinner_names(s: &Spinners) {
     for n in s.keys() {
         println!("{n}");
     }
-}
-
-fn print_status(count: u64, frame: String) {
-    println!("{} {}", frame, count);
 }
