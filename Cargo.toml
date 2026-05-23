@@ -1,7 +1,7 @@
 [package]
 name = "vsleep"
 version = "0.1.0"
-description = "A simple app for visualizing sleep."
+description = "A very verbose visualizer for sleep."
 categories = ["command-line-utilities", "network-programming"]
 authors = ["Chad Eldridge <chad.eldridge@gmail.com>"]
 homepage = "https://github.com/chadeldridge/port-tester"
