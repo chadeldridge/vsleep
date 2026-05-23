@@ -1,1 +1,1 @@
-pub mod spinner;
+pub mod core;

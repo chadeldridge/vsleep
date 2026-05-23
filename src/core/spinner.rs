@@ -47,9 +47,13 @@ impl Spinners {
 }
 
 pub struct Spinner {
+    /// Spinner name as referenced in the JSON.
     name: String,
+    /// Length of the `frames` array.
     frame_count: usize,
+    /// The frame to display.
     cur_frame: usize,
+    /// An array of frames in order to display.
     frames: Frames,
 }
 
