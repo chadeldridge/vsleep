@@ -46,7 +46,8 @@ impl Timer {
     where
         F: FnMut(&TickData),
     {
-        let int_duration = self.get_interval_duration()
+        let int_duration = self
+            .get_interval_duration()
             .to_std()
             .expect("interval must be positive");
 

@@ -53,7 +53,12 @@ fn format_tick(frame: &str, tick: &TickData, verbose: u8, date_format: &str) -> 
     match verbose {
         0 => frame.to_string(),
         1 => format!("{} {}", frame, tick.remaining),
-        _ => format!("{} {} {}", tick.now.format(date_format), frame, tick.remaining),
+        _ => format!(
+            "{} {} {}",
+            tick.now.format(date_format),
+            frame,
+            tick.remaining
+        ),
     }
 }
 
