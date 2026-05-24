@@ -1,9 +1,10 @@
-use chrono::TimeDelta;
+use std::time::Duration;
+
 use vsleep::core::{Error, Spinners, TickData, Timer};
 
 mod cli;
 
-const DEFAULT_INTERVAL: i64 = 1;
+const DEFAULT_INTERVAL: u64 = 1;
 
 fn main() {
     let cli = cli::Cli::new(cli::Args::new());
@@ -35,8 +36,8 @@ fn main() {
     };
 
     let mut t = Timer::new(
-        TimeDelta::seconds(duration),
-        TimeDelta::seconds(DEFAULT_INTERVAL),
+        Duration::from_secs(duration as u64),
+        Duration::from_secs(DEFAULT_INTERVAL),
     );
     let mut s = match spinners.get_spinner(&cli.args.spinner) {
         Some(s) => s,

@@ -1,4 +1,4 @@
-use std::{fmt, thread};
+use std::{fmt, thread, time::Duration};
 
 use chrono::{DateTime, Local, TimeDelta, TimeZone, Utc};
 
@@ -53,14 +53,14 @@ pub struct Timer {
 }
 
 impl Timer {
-    pub fn new(duration: TimeDelta, interval: TimeDelta) -> Timer {
-        let dur = duration.num_seconds();
-        let int = match interval.num_seconds() {
+    pub fn new(duration: Duration, interval: Duration) -> Timer {
+        let dur = duration.as_secs() as i64;
+        let int = match interval.as_secs() {
             0 => 1,
-            n => n,
+            n => n as i64,
         };
         let start = Utc::now();
-        let end = start + duration;
+        let end = start + TimeDelta::seconds(dur);
 
         Timer {
             state: TimerState::Ready(dur),
@@ -76,10 +76,7 @@ impl Timer {
     where
         F: FnMut(&TickData),
     {
-        let int_duration = self
-            .interval_duration()
-            .to_std()
-            .expect("interval must be positive");
+        let int_duration = Duration::from_secs(self.int as u64);
 
         self.state = TimerState::InProgress(0);
         let steps = self.dur / self.int;
