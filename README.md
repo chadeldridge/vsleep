@@ -69,3 +69,9 @@ The current MSRV is `1.85`. It follows the N-2 stable release policy and may onl
 
 ## Contributing
 If you would like to contribute, see [here](CONTRIBUTING.md).
+
+## AI Disclosure
+Most of this project was written manually. Some AI was used to help with small iterations, documentation, and to improve the release process.
+
+### AI Use Preferences
+As above, use AI as a tool, not as a developer. Data correlation and editing, small iterations, etc. are ok. All work done by an AI should be noted, reviewed, and vouched for by a human.
