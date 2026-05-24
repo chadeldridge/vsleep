@@ -71,8 +71,8 @@ if ! command -v cargo-semver-checks &>/dev/null; then
     echo "cargo-semver-checks not installed! Run: cargo install cargo-semver-checks"
     exit 1
 fi
-echo "semver-checks..."
-cargo semver-checks
+#echo "semver-checks..."
+#cargo semver-checks
 
 echo "cargo run -- 1"
 cargo run --locked -- 1

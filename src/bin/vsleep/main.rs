@@ -1,4 +1,4 @@
-use vsleep::core::{Spinners, TickData, Timer};
+use vsleep::core::{Error, Spinners, TickData, Timer};
 
 mod cli;
 
@@ -14,7 +14,7 @@ fn main() {
         match spinners.import_spinners(cli.args.file) {
             Ok(_) => {}
             Err(err) => {
-                println!("error loading spinners file: {}", err);
+                eprintln!("error: {err}");
                 std::process::exit(1);
             }
         };
@@ -37,7 +37,7 @@ fn main() {
     let mut s = match spinners.get_spinner(&cli.args.spinner) {
         Some(s) => s,
         None => {
-            println!("error: spinner not found");
+            eprintln!("{}", Error::SpinnerNotFound(cli.args.spinner.clone()));
             std::process::exit(1);
         }
     };

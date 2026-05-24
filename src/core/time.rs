@@ -1,11 +1,28 @@
-use std::thread;
+use std::{fmt, thread};
 
 use chrono::{DateTime, Local, TimeDelta, TimeZone, Utc};
 
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum TimerState {
     Ready(i64),
     InProgress(i64),
     Ended(i64),
+}
+
+impl Default for TimerState {
+    fn default() -> Self {
+        TimerState::Ready(0)
+    }
+}
+
+impl fmt::Display for TimerState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TimerState::Ready(n) => write!(f, "Ready ({n}s)"),
+            TimerState::InProgress(n) => write!(f, "In Progress ({n}s elapsed)"),
+            TimerState::Ended(n) => write!(f, "Ended ({n}s)"),
+        }
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
@@ -15,6 +32,17 @@ pub struct TickData {
     pub now: DateTime<Local>,
 }
 
+impl fmt::Display for TickData {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "elapsed: {}s, remaining: {}s",
+            self.elapsed, self.remaining
+        )
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct Timer {
     state: TimerState,
     start: DateTime<Utc>,
@@ -113,6 +141,12 @@ impl Timer {
 
     pub fn time_remaining(&self) -> TimeDelta {
         self.end - Utc::now()
+    }
+}
+
+impl fmt::Display for Timer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.state)
     }
 }
 
