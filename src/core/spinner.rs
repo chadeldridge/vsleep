@@ -81,11 +81,12 @@ impl FromIterator<(String, SpinnerData)> for Spinners {
 }
 
 impl Spinners {
+    pub fn contains_spinner(&self, name: &str) -> bool {
+        self.0.contains_key(name)
+    }
+
     pub fn get_spinner(&self, name: &str) -> Option<Spinner> {
-        match self.0.contains_key(name) {
-            true => Some(Spinner::new(name, &self.0[name])),
-            _ => None,
-        }
+        self.0.get(name).map(|data| Spinner::new(name, data))
     }
 
     #[cfg(feature = "serde")]
