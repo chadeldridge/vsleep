@@ -2,11 +2,21 @@ use std::{fmt, thread, time::Duration};
 
 use chrono::{DateTime, Local, TimeDelta, TimeZone, Utc};
 
+/// The current state of a [`Timer`].
 #[non_exhaustive]
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum TimerState {
+    /// The timer has been created but [`Timer::run`] has not yet been called.
+    ///
+    /// The inner value is the total duration in seconds.
     Ready(i64),
+    /// The timer is actively running.
+    ///
+    /// The inner value is the number of seconds elapsed.
     InProgress(i64),
+    /// The timer has completed.
+    ///
+    /// The inner value is the total duration in seconds.
     Ended(i64),
 }
 
@@ -26,11 +36,18 @@ impl fmt::Display for TimerState {
     }
 }
 
+/// A snapshot of timer state delivered to the tick callback on each interval.
+///
+/// `TickData` is constructed by [`Timer::run`] and passed by reference to the
+/// callback on each tick. It cannot be constructed externally.
 #[non_exhaustive]
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct TickData {
+    /// Seconds elapsed since the timer started.
     pub elapsed: i64,
+    /// Seconds remaining until the timer ends.
     pub remaining: i64,
+    /// Local timestamp at the moment this tick fired.
     pub now: DateTime<Local>,
 }
 
@@ -44,6 +61,21 @@ impl fmt::Display for TickData {
     }
 }
 
+/// A countdown timer that calls a tick function on each interval.
+///
+/// Create a timer with [`Timer::new`] and drive it with [`Timer::run`].
+///
+/// # Examples
+///
+/// ```no_run
+/// use std::time::Duration;
+/// use vsleep::core::Timer;
+///
+/// let mut timer = Timer::new(Duration::from_secs(10), Duration::from_secs(1));
+/// timer.run(|tick| {
+///     println!("{}s remaining", tick.remaining);
+/// });
+/// ```
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct Timer {
     state: TimerState,
@@ -55,6 +87,21 @@ pub struct Timer {
 }
 
 impl Timer {
+    /// Creates a new timer with the given total `duration` and tick `interval`.
+    ///
+    /// If `interval` is zero it is clamped to one second. Sub-second values
+    /// are truncated to whole seconds.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::time::Duration;
+    /// use vsleep::core::Timer;
+    ///
+    /// let timer = Timer::new(Duration::from_secs(60), Duration::from_secs(1));
+    /// assert_eq!(timer.duration(), 60);
+    /// assert_eq!(timer.interval(), 1);
+    /// ```
     pub fn new(duration: Duration, interval: Duration) -> Timer {
         let dur = duration.as_secs() as i64;
         let int = match interval.as_secs() {
@@ -74,6 +121,22 @@ impl Timer {
         }
     }
 
+    /// Runs the timer, calling `tick_fn` once per interval until the duration elapses.
+    ///
+    /// The callback receives a [`TickData`] snapshot with elapsed time, remaining
+    /// time, and the current local timestamp. This method blocks the calling thread.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use vsleep::core::Timer;
+    ///
+    /// let mut timer = Timer::new(Duration::from_secs(5), Duration::from_secs(1));
+    /// timer.run(|tick| {
+    ///     println!("{}s remaining", tick.remaining);
+    /// });
+    /// ```
     pub fn run<F>(&mut self, mut tick_fn: F)
     where
         F: FnMut(&TickData),
@@ -95,42 +158,77 @@ impl Timer {
         }
     }
 
+    /// Returns the current [`TimerState`].
     pub fn state(&self) -> TimerState {
         self.state
     }
 
+    /// Returns the UTC timestamp when the timer was created.
     pub fn start(&self) -> DateTime<Utc> {
         self.start
     }
 
+    /// Returns the timer's start time converted to the given timezone.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::time::Duration;
+    /// use chrono::Local;
+    /// use vsleep::core::Timer;
+    ///
+    /// let timer = Timer::new(Duration::from_secs(10), Duration::from_secs(1));
+    /// let _ = timer.start_tz(Local);
+    /// ```
     pub fn start_tz<Tz: TimeZone>(&self, timezone: Tz) -> DateTime<Tz> {
         self.start.with_timezone(&timezone)
     }
 
+    /// Returns the tick interval in seconds.
     pub fn interval(&self) -> i64 {
         self.int
     }
 
+    /// Returns the tick interval as a [`chrono::TimeDelta`].
     pub fn interval_duration(&self) -> TimeDelta {
         TimeDelta::seconds(self.int)
     }
 
+    /// Returns the total timer duration in seconds.
     pub fn duration(&self) -> i64 {
         self.dur
     }
 
+    /// Returns the number of seconds elapsed since the timer started.
     pub fn elapsed(&self) -> i64 {
         self.cur
     }
 
+    /// Returns the UTC timestamp at which the timer will end.
     pub fn end(&self) -> DateTime<Utc> {
         self.end
     }
 
+    /// Returns the timer's end time converted to the given timezone.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::time::Duration;
+    /// use chrono::Local;
+    /// use vsleep::core::Timer;
+    ///
+    /// let timer = Timer::new(Duration::from_secs(10), Duration::from_secs(1));
+    /// let _ = timer.end_tz(Local);
+    /// ```
     pub fn end_tz<Tz: TimeZone>(&self, timezone: Tz) -> DateTime<Tz> {
         self.end.with_timezone(&timezone)
     }
 
+    /// Advances the timer by one interval, updating elapsed time and [`TimerState`].
+    ///
+    /// Called automatically by [`Timer::run`]. Exposed for callers who want to
+    /// drive the timer manually.
     pub fn step(&mut self) {
         self.cur += self.int;
         self.state = match self.cur {
@@ -139,6 +237,10 @@ impl Timer {
         };
     }
 
+    /// Returns the time remaining until the timer ends as a [`chrono::TimeDelta`].
+    ///
+    /// Computed from the current wall-clock time; may differ slightly from the
+    /// `remaining` field in a [`TickData`] snapshot.
     pub fn time_remaining(&self) -> TimeDelta {
         self.end - Utc::now()
     }

@@ -1,3 +1,5 @@
+//! Core timer and spinner primitives.
+
 pub use error::{Error, Result};
 pub use spinner::Spinners;
 pub use time::{TickData, Timer};
