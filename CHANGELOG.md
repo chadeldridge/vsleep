@@ -13,3 +13,5 @@ See [Contributing](CONTRIBUTING.md) for details on how to add to the Changelog.
   - Refactored spinner.rs into core module. #1 (@chadeldridge)
 ### Deprecated
 ### Removed
+
+[Unreleased]: https://github.com/chadeldridge/vsleep/compare/2ac02d7...HEAD

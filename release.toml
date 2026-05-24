@@ -32,3 +32,12 @@ replace = """## [Unreleased]
 
 ## [{{version}}] - {{date}}"""
 exactly = 1
+
+# Update the [Unreleased] comparison link and insert a new versioned link.
+# The seed uses the initial commit hash so the first release produces a valid
+# compare URL (all commits to v0.1.0). Subsequent releases produce vOLD...vNEW.
+[[pre-release-replacements]]
+file    = "CHANGELOG.md"
+search  = "\\[Unreleased\\]: https://github\\.com/chadeldridge/vsleep/compare/(.+)\\.\\.\\.HEAD"
+replace = "[Unreleased]: https://github.com/chadeldridge/vsleep/compare/v{{version}}...HEAD\n[{{version}}]: https://github.com/chadeldridge/vsleep/compare/${1}...v{{version}}"
+exactly = 1
