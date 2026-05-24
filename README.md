@@ -64,5 +64,8 @@ Done
 Done
 ```
 
+## Minimum Supported Rust Version
+The current MSRV is `1.85`. It follows the N-2 stable release policy and may only be raised in minor releases. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
 ## Contributing
 If you would like to contribute, see [here](CONTRIBUTING.md).
