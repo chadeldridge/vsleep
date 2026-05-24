@@ -95,8 +95,8 @@ impl Timer {
         }
     }
 
-    pub fn state(&self) -> &TimerState {
-        &self.state
+    pub fn state(&self) -> TimerState {
+        self.state
     }
 
     pub fn start(&self) -> DateTime<Utc> {
