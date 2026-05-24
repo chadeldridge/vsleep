@@ -1,23 +1,15 @@
 # vsleep
-A simple app for visualizing sleep. 
+A very verbose visualizer for sleep.
 
-Sometimes I need to sleep but I need a visual indicator that the sleep is still running.
+Sometimes I need to sleep but I need a visual indicator the sleep is still running.
+
+## Installation
+Release packages can be found [here](https://github.com/chadeldridge/vsleep/releases).
 
 ## Help
 ```
-A simple app for visualizing sleep.
-
-Usage: vsleep [OPTIONS] [DURATION]
-
-Arguments:
-  [DURATION]  Sleep duration in seconds
-
-Options:
-  -f, --file <FILE>        Alternate spinners file to import. Expected format: { "spinner_name": { frames: [ "-----", "1----", "12---", "123--", "1234-", "12345", ], } } [default: spinners.json]
-      --list               List spinner names
-  -s, --spinner <SPINNER>  Name of spinner to use. Default: aesthetic [default: aesthetic]
-  -h, --help               Print help
-  -V, --version            Print version
+  -h, --help                       Print help
+  -V, --version                    Print version
 ```
 
 ## Spinners
@@ -48,10 +40,29 @@ You can provide your own spinners by passing the path to a json file with `-f, -
 ## Examples
 ```bash
 ❯ vsleep 5; echo "Done"
-▰▱▱▱▱▱▱ 1
-▰▰▱▱▱▱▱ 2
+▰▱▱▱▱▱▱
+▰▰▱▱▱▱▱
+▰▰▰▱▱▱▱
+▰▰▰▰▱▱▱
+▰▰▰▰▰▱▱
+Done
+
+❯ vsleep -v 5; echo "Done"
+▰▱▱▱▱▱▱ 5
+▰▰▱▱▱▱▱ 4
 ▰▰▰▱▱▱▱ 3
-▰▰▰▰▱▱▱ 4
-▰▰▰▰▰▱▱ 5
+▰▰▰▰▱▱▱ 2
+▰▰▰▰▰▱▱ 1
+Done
+
+❯ vsleep -vv 5; echo "Done"
+2026-05-23 16:24:22 -0400 ▰▱▱▱▱▱▱ 5
+2026-05-23 16:24:23 -0400 ▰▰▱▱▱▱▱ 4
+2026-05-23 16:24:24 -0400 ▰▰▰▱▱▱▱ 3
+2026-05-23 16:24:25 -0400 ▰▰▰▰▱▱▱ 2
+2026-05-23 16:24:26 -0400 ▰▰▰▰▰▱▱ 1
 Done
 ```
+
+## Contributing
+If you would like to contribute, see [here](CONTRIBUTING.md).
