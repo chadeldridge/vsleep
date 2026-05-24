@@ -8,6 +8,7 @@ pub enum TimerState {
     Ended(i64),
 }
 
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct TickData {
     pub elapsed: i64,
     pub remaining: i64,
@@ -42,12 +43,12 @@ impl Timer {
         }
     }
 
-    pub fn start<F>(&mut self, mut tick_fn: F)
+    pub fn run<F>(&mut self, mut tick_fn: F)
     where
         F: FnMut(&TickData),
     {
         let int_duration = self
-            .get_interval_duration()
+            .interval_duration()
             .to_std()
             .expect("interval must be positive");
 
@@ -66,27 +67,27 @@ impl Timer {
         }
     }
 
-    pub fn get_state(&self) -> &TimerState {
+    pub fn state(&self) -> &TimerState {
         &self.state
     }
 
-    pub fn get_start(&self) -> DateTime<Utc> {
+    pub fn start(&self) -> DateTime<Utc> {
         self.start
     }
 
-    pub fn get_start_tz<Tz: TimeZone>(&self, timezone: Tz) -> DateTime<Tz> {
+    pub fn start_tz<Tz: TimeZone>(&self, timezone: Tz) -> DateTime<Tz> {
         self.start.with_timezone(&timezone)
     }
 
-    pub fn get_interval(&self) -> i64 {
+    pub fn interval(&self) -> i64 {
         self.int
     }
 
-    pub fn get_interval_duration(&self) -> TimeDelta {
+    pub fn interval_duration(&self) -> TimeDelta {
         TimeDelta::seconds(self.int)
     }
 
-    pub fn get_duration(&self) -> i64 {
+    pub fn duration(&self) -> i64 {
         self.dur
     }
 
@@ -94,11 +95,11 @@ impl Timer {
         self.cur
     }
 
-    pub fn get_end(&self) -> DateTime<Utc> {
+    pub fn end(&self) -> DateTime<Utc> {
         self.end
     }
 
-    pub fn get_end_tz<Tz: TimeZone>(&self, timezone: Tz) -> DateTime<Tz> {
+    pub fn end_tz<Tz: TimeZone>(&self, timezone: Tz) -> DateTime<Tz> {
         self.end.with_timezone(&timezone)
     }
 
@@ -113,4 +114,20 @@ impl Timer {
     pub fn time_remaining(&self) -> TimeDelta {
         self.end - Utc::now()
     }
+}
+
+#[test]
+fn test_send() {
+    fn assert_send<T: Send>() {}
+    assert_send::<TimerState>();
+    assert_send::<TickData>();
+    assert_send::<Timer>();
+}
+
+#[test]
+fn test_sync() {
+    fn assert_sync<T: Sync>() {}
+    assert_sync::<TimerState>();
+    assert_sync::<TickData>();
+    assert_sync::<Timer>();
 }

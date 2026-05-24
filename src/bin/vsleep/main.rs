@@ -42,8 +42,8 @@ fn main() {
         }
     };
 
-    t.start(|tick| {
-        let frame = s.get_frame();
+    t.run(|tick| {
+        let frame = s.frame();
         println!("{}", format_tick(&frame, tick, verbose, &date_format));
         s.step_frame();
     });

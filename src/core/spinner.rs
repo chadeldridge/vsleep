@@ -1,17 +1,17 @@
 use std::{collections::HashMap, error::Error, fs::File, io::BufReader, path::Path};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 const BUNDLED_SPINNERS: &str = include_str!("spinners.json");
 
 type Frames = Vec<String>;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug)]
 pub struct SpinnerData {
     frames: Frames,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug)]
 pub struct Spinners(HashMap<String, SpinnerData>);
 
 impl Default for Spinners {
@@ -46,11 +46,10 @@ impl Spinners {
     }
 }
 
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Default)]
 pub struct Spinner {
     /// Spinner name as referenced in the JSON.
     name: String,
-    /// Length of the `frames` array.
-    frame_count: usize,
     /// The frame to display.
     cur_frame: usize,
     /// An array of frames in order to display.
@@ -61,23 +60,26 @@ impl Spinner {
     pub fn new(name: &str, s: &SpinnerData) -> Self {
         Spinner {
             name: name.into(),
-            frame_count: s.frames.len(),
             cur_frame: 0,
             frames: s.frames.clone(),
         }
     }
 
-    pub fn get_name(&self) -> String {
+    pub fn name(&self) -> String {
         self.name.clone()
     }
 
-    pub fn get_frame(&self) -> String {
+    pub fn frame(&self) -> String {
         self.frames[self.cur_frame].to_string()
+    }
+
+    pub fn frame_count(&self) -> usize {
+        self.frames.len()
     }
 
     pub fn step_frame(&mut self) {
         match self.cur_frame {
-            n if n == self.frame_count - 1 => self.cur_frame = 0,
+            n if n == self.frame_count() - 1 => self.cur_frame = 0,
             _ => self.cur_frame += 1,
         }
     }
