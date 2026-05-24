@@ -2,6 +2,7 @@ use std::{fmt, thread, time::Duration};
 
 use chrono::{DateTime, Local, TimeDelta, TimeZone, Utc};
 
+#[non_exhaustive]
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum TimerState {
     Ready(i64),
@@ -25,6 +26,7 @@ impl fmt::Display for TimerState {
     }
 }
 
+#[non_exhaustive]
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct TickData {
     pub elapsed: i64,
