@@ -53,19 +53,20 @@ pub struct Timer {
 }
 
 impl Timer {
-    pub fn new(duration: i64, interval: i64) -> Timer {
-        let int = match interval {
+    pub fn new(duration: TimeDelta, interval: TimeDelta) -> Timer {
+        let dur = duration.num_seconds();
+        let int = match interval.num_seconds() {
             0 => 1,
-            _ => interval,
+            n => n,
         };
         let start = Utc::now();
-        let end = start + TimeDelta::seconds(duration);
+        let end = start + duration;
 
         Timer {
-            state: TimerState::Ready(duration),
+            state: TimerState::Ready(dur),
             start,
             int,
-            dur: duration,
+            dur,
             cur: 0,
             end,
         }

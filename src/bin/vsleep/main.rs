@@ -1,3 +1,4 @@
+use chrono::TimeDelta;
 use vsleep::core::{Error, Spinners, TickData, Timer};
 
 mod cli;
@@ -33,7 +34,10 @@ fn main() {
         }
     };
 
-    let mut t = Timer::new(duration, DEFAULT_INTERVAL);
+    let mut t = Timer::new(
+        TimeDelta::seconds(duration),
+        TimeDelta::seconds(DEFAULT_INTERVAL),
+    );
     let mut s = match spinners.get_spinner(&cli.args.spinner) {
         Some(s) => s,
         None => {
