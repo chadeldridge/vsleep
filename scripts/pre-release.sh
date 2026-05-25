@@ -25,7 +25,6 @@ fi
 echo msrv...
 cargo msrv find --write-msrv
 
-# rustfmt job
 if ! command -v cargo-fmt &>/dev/null; then
     echo "cargo-fmt not installed!!!"
     exit 1
@@ -33,7 +32,6 @@ fi
 echo "format check..."
 cargo fmt --all --check
 
-# clippy job
 if ! command -v cargo-clippy &>/dev/null; then
     echo "cargo-clippy not installed!!!"
     exit 1
@@ -41,7 +39,7 @@ fi
 echo "clippy..."
 cargo clippy --workspace --all-targets --no-deps -- -D warnings
 
-# test job
+# Run test jobs.
 echo "test --locked --release..."
 cargo test --locked --release
 
@@ -74,11 +72,17 @@ fi
 #echo "semver-checks..."
 #cargo semver-checks
 
+# Binary build and run.
+echo
 echo "cargo run -- 1"
 cargo run --locked -- 1
-
 echo "cargo run -- -v 1"
 cargo run --locked -- -v 1
-
 echo "cargo run -- -vv 1"
 cargo run --locked -- -vv 1
+
+# Publish library dryrun and checks.
+echo
+cargo publish --dry-run
+du -sh target/package/tmp-crate/*.crate
+cargo package --list
