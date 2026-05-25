@@ -1,6 +1,6 @@
 use std::{fmt, thread, time::Duration};
 
-use chrono::{DateTime, Local, TimeDelta, TimeZone, Utc};
+use chrono::{DateTime, Local, TimeDelta, TimeZone};
 
 /// The current state of a [`Timer`].
 #[non_exhaustive]
@@ -39,7 +39,7 @@ impl fmt::Display for TimerState {
 /// A snapshot of timer state delivered to the tick callback on each interval.
 ///
 /// `TickData` is constructed by [`Timer::run`] and passed by reference to the
-/// callback on each tick. It cannot be constructed externally.
+/// callback on each tick.
 #[non_exhaustive]
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct TickData {
@@ -79,11 +79,11 @@ impl fmt::Display for TickData {
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Default)]
 pub struct Timer {
     state: TimerState,
-    start: DateTime<Utc>,
+    start: DateTime<Local>,
     int: i64,
     dur: i64,
     cur: i64,
-    end: DateTime<Utc>,
+    end: DateTime<Local>,
 }
 
 impl Timer {
@@ -108,7 +108,7 @@ impl Timer {
             0 => 1,
             n => n as i64,
         };
-        let start = Utc::now();
+        let start = Local::now();
         let end = start + TimeDelta::seconds(dur);
 
         Timer {
@@ -163,8 +163,8 @@ impl Timer {
         self.state
     }
 
-    /// Returns the UTC timestamp when the timer was created.
-    pub fn start(&self) -> DateTime<Utc> {
+    /// Returns the local timestamp when the timer was created.
+    pub fn start(&self) -> DateTime<Local> {
         self.start
     }
 
@@ -204,8 +204,8 @@ impl Timer {
         self.cur
     }
 
-    /// Returns the UTC timestamp at which the timer will end.
-    pub fn end(&self) -> DateTime<Utc> {
+    /// Returns the local timestamp at which the timer will end.
+    pub fn end(&self) -> DateTime<Local> {
         self.end
     }
 
@@ -242,7 +242,7 @@ impl Timer {
     /// Computed from the current wall-clock time; may differ slightly from the
     /// `remaining` field in a [`TickData`] snapshot.
     pub fn time_remaining(&self) -> TimeDelta {
-        self.end - Utc::now()
+        self.end - Local::now()
     }
 }
 
@@ -266,4 +266,24 @@ fn test_sync() {
     assert_sync::<TimerState>();
     assert_sync::<TickData>();
     assert_sync::<Timer>();
+}
+
+#[test]
+fn test_timer_new() {
+    let timer = Timer::new(Duration::from_secs(60), Duration::from_secs(1));
+    assert_eq!(timer.duration(), 60);
+    assert_eq!(timer.interval(), 1);
+    assert_eq!(timer.state(), TimerState::Ready(60));
+    assert!(timer.start().timestamp() > 0);
+    assert!(timer.end().timestamp() > 0);
+    assert!(timer.end() > timer.start());
+}
+
+#[test]
+fn test_timer_run() {
+    let mut timer = Timer::new(Duration::from_secs(2), Duration::from_secs(1));
+    assert_eq!(timer.state(), TimerState::Ready(2));
+    timer.run(|_| {});
+    assert_eq!(timer.state(), TimerState::Ended(2));
+    assert_eq!(timer.cur, 2);
 }
