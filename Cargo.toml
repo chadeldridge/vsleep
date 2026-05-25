@@ -1,8 +1,8 @@
 [package]
 name = "vsleep"
 version = "0.1.0"
-description = "A very verbose visualizer for sleep."
-categories = ["command-line-utilities", "network-programming"]
+description = "A verbose, visual replacement for the Unix `sleep` command."
+categories = ["command-line-utilities"]
 authors = ["Chad Eldridge <chad.eldridge@gmail.com>"]
 homepage = "https://github.com/chadeldridge/port-tester"
 license = "MIT OR Apache-2.0"

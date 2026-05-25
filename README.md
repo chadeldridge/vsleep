@@ -1,5 +1,5 @@
 # vsleep
-A very verbose visualizer for sleep.
+A verbose, visual replacement for the Unix `sleep` command.
 
 Sometimes I need to sleep but I need a visual indicator the sleep is still running.
 
