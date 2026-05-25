@@ -83,6 +83,7 @@ cargo run --locked -- -vv 1
 
 # Publish library dryrun and checks.
 echo
+echo "cargo publish..."
 cargo publish --dry-run --allow-dirty
 du -sh target/package/tmp-crate/*.crate
-cargo package --list
+cargo package --list --allow-dirty
