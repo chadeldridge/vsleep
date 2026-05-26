@@ -139,7 +139,7 @@ jobs:
       - name: Git Checkout
         uses: actions/checkout@v6
       - name: Spell Check Repo
-        uses: crate-ci/typos@v1.42.0
+        uses: crate-ci/typos@v1.46.3
   msrv:
     runs-on: ubuntu-latest
     steps:
@@ -484,7 +484,7 @@ jobs:
           path: ${{ steps.debian-package.outputs.DPKG_PATH }}
 
       - name: Publish archives and packages
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: needs.metadata.outputs.is_release == 'true'
         with:
           files: |
