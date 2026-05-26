@@ -212,6 +212,8 @@ jobs:
       - lint
       - test
       - audit
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -488,8 +490,6 @@ jobs:
           files: |
             ${{ steps.package.outputs.PKG_PATH }}
             ${{ steps.debian-package.outputs.DPKG_PATH }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     name: Publish to crates.io
